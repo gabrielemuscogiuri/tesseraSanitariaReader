@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "luhn": "^2.4.1",
+    "pcsclite": "^1.0.1"
+  }
+}
