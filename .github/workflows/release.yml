@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install PC/SC headers
+        run: sudo apt-get update && sudo apt-get install -y libpcsclite-dev
+      - run: pnpm install
+      - run: pnpm test && pnpm typecheck && pnpm lint && pnpm build
+      - run: npm pack
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: tessera-sanitaria-reader-*.tgz
+          generate_release_notes: true

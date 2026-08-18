@@ -1,0 +1,39 @@
+# dipendenze e lock alternativi
+node_modules/
+.pnpm-store/
+package-lock.json
+npm-shrinkwrap.json
+
+# build / publish
+dist/
+demo/dist/
+build/
+*.tgz
+*.tsbuildinfo
+
+# test e coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# log e debug
+*.log
+npm-debug.log*
+pnpm-debug.log*
+.cursor/debug-*.log
+
+# env e segreti
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# native (pcsclite)
+*.node
+compile_commands.json
