@@ -8,6 +8,10 @@ npm-shrinkwrap.json
 dist/
 demo/dist/
 build/
+reader/dist-main/
+reader/dist-renderer/
+reader/release/
+reader/node_modules/
 *.tgz
 *.tsbuildinfo
 

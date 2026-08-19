@@ -17,5 +17,5 @@
     "declaration": true,
     "types": ["node"]
   },
-  "include": ["src", "test", "demo/server.ts"]
+  "include": ["src", "test"]
 }

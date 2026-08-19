@@ -1,6 +1,6 @@
 {
   "name": "tessera-sanitaria-reader",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "Read Italian tessera sanitaria (TS-CNS) personal data via PC/SC",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -19,7 +19,8 @@
     }
   },
   "bin": {
-    "tessera-sanitaria-reader": "./dist/cli.js"
+    "tessera-sanitaria-reader": "./dist/cli.js",
+    "tessera-sanitaria-agent": "./dist/agent.js"
   },
   "files": [
     "dist",
@@ -33,15 +34,12 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/cli.ts",
-    "demo": "concurrently -k -n server,ui -c blue,green \"pnpm demo:server\" \"pnpm demo:ui\"",
-    "demo:server": "tsx demo/server.ts",
-    "demo:ui": "vite --config demo/vite.config.ts",
     "start": "node dist/cli.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit && tsc --noEmit -p demo/tsconfig.json",
-    "lint": "eslint src test demo --max-warnings 0 && prettier --check .",
-    "lint:fix": "eslint src test demo --fix --max-warnings 0 && prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src test --max-warnings 0 && prettier --check .",
+    "lint:fix": "eslint src test --fix --max-warnings 0 && prettier --write .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepublishOnly": "pnpm test && pnpm typecheck && pnpm lint && pnpm build",

@@ -22,7 +22,7 @@ export const subscribeTesseraSanitaria = (
   source.onerror = () => {
     onEvent({
       type: 'error',
-      message: 'Server locale non raggiungibile. Avvia pnpm web.',
+      message: 'Agente locale non raggiungibile. Avvia `npx tessera-sanitaria-agent`.',
     });
   };
   return { close: () => source.close() };

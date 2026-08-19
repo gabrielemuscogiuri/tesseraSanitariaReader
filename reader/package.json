@@ -1,0 +1,97 @@
+{
+  "name": "tessera-sanitaria-electron",
+  "version": "1.0.1",
+  "description": "App desktop per leggere la tessera sanitaria — doppio click, rimane nel tray, niente terminale",
+  "private": true,
+  "type": "commonjs",
+  "main": "dist-main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build:main": "node build-main.mjs",
+    "build:renderer": "vite build",
+    "build": "npm run build:main && npm run build:renderer",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dev": "concurrently -k -n main,renderer \"npm run build:main -- --watch\" \"vite\""
+  },
+  "build": {
+    "appId": "it.tessera-sanitaria.reader",
+    "productName": "Lettore Tessera Sanitaria",
+    "copyright": "Copyright © 2026 Gabriele Muscogiuri",
+    "asar": true,
+    "files": [
+      "dist-main/**/*",
+      "dist-renderer/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "extraResources": [],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Lettore Tessera Sanitaria"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.icns",
+      "category": "public.app-category.utilities"
+    },
+    "dmg": {
+      "title": "Lettore Tessera Sanitaria",
+      "background": null
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png",
+      "category": "Utility"
+    }
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "concurrently": "^9.2.0",
+    "esbuild": "^0.25.0",
+    "electron": "^36.0.0",
+    "electron-builder": "^25.0.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "tessera-sanitaria-reader": "file:../..",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
+    "vite-plugin-electron": "^0.29.0"
+  },
+  "dependencies": {
+    "pcsclite": "^1.0.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -5,7 +5,7 @@ TypeScript library and CLI that reads **anagraphic data** from the Italian healt
 [![GitHub release](https://img.shields.io/github/v/release/gabrielemuscogiuri/tesseraSanitariaReader)](https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases)
 [![license](https://img.shields.io/github/license/gabrielemuscogiuri/tesseraSanitariaReader.svg)](LICENSE)
 
-See [CHANGELOG.md](CHANGELOG.md) for the 1.0.0 release notes.
+See [CHANGELOG.md](CHANGELOG.md) for the latest release notes.
 
 Dual package (ESM + CommonJS), CLI, and a browser client subpath. Municipality names ship as a single JSON asset. The React UI in this Git repository is a **local demo** and is not part of the published tarball.
 
@@ -15,30 +15,36 @@ Dual package (ESM + CommonJS), CLI, and a browser client subpath. Municipality n
 
 Node.js **18+** and a PC/SC smart-card reader. The package is published as a **GitHub Release** (npm registry requires 2FA on the publisher account).
 
-From the v1.0.0 tarball:
+From the v1.1.0 tarball:
 
 ```bash
-npm install https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases/download/v1.0.0/tessera-sanitaria-reader-1.0.0.tgz
+npm install https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases/download/v1.1.0/tessera-sanitaria-reader-1.1.0.tgz
 ```
 
 ```bash
-pnpm add https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases/download/v1.0.0/tessera-sanitaria-reader-1.0.0.tgz
+pnpm add https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases/download/v1.1.0/tessera-sanitaria-reader-1.1.0.tgz
 ```
 
 From git (builds `dist/` on install):
 
 ```bash
-npm install github:gabrielemuscogiuri/tesseraSanitariaReader#v1.0.0
+npm install github:gabrielemuscogiuri/tesseraSanitariaReader#v1.1.0
 ```
 
 ```bash
-pnpm add github:gabrielemuscogiuri/tesseraSanitariaReader#v1.0.0
+pnpm add github:gabrielemuscogiuri/tesseraSanitariaReader#v1.1.0
 ```
 
 CLI, after a local install:
 
 ```bash
 npx tessera-sanitaria-reader
+```
+
+SSE agent, after a local install:
+
+```bash
+npx tessera-sanitaria-agent
 ```
 
 The native addon `pcsclite` is installed as a dependency. On Linux you also need `pcscd` and `libpcsclite`. macOS and Windows already provide a PC/SC stack.
@@ -70,15 +76,16 @@ flowchart LR
   PCSC --> Node[watchTesseraSanitaria]
   Node --> Parse[parse_and_geo]
   Parse --> CLI[CLI]
-  Parse --> Agent[demo_SSE_agent]
-  Agent --> React[Vite_React_demo]
-  Node --> Electron[Electron_main]
+  Parse --> Agent[tessera-sanitaria-agent]
+  Agent -->|"SSE loopback"| WebApp[Web_app]
+  Node --> ElectronMain[Electron_main]
+  ElectronMain -->|IPC| ElectronUI[Electron_renderer]
 ```
 
-| Consumer                            | Import                            | Runtime                                 |
-| ----------------------------------- | --------------------------------- | --------------------------------------- |
-| CLI, demo server, Electron **main** | `tessera-sanitaria-reader`        | Node 18+, `pcsclite`                    |
-| Vite / React / Next **client**      | `tessera-sanitaria-reader/client` | Browser `EventSource` → local SSE agent |
+| Consumer                       | Import                            | Runtime                                 |
+| ------------------------------ | --------------------------------- | --------------------------------------- |
+| CLI, agent, Electron **main**  | `tessera-sanitaria-reader`        | Node 18+, `pcsclite`                    |
+| Vite / React / Next **client** | `tessera-sanitaria-reader/client` | Browser `EventSource` → local SSE agent |
 
 Do not import the main entry in a browser bundle. It will fail to resolve the native addon.
 
@@ -120,15 +127,15 @@ pnpm dev
 
 Insert the card when the reader is listed. JSON is printed to stdout. Empty chip fields are omitted.
 
-### Local React demo
+### Local SSE agent
 
-The UI is not published on npm. In this repo:
+If you want to consume the reader events from a frontend, start the local SSE agent:
 
 ```bash
-pnpm demo
+npx tessera-sanitaria-agent
 ```
 
-That starts a loopback SSE agent on [http://127.0.0.1:3847/events](http://127.0.0.1:3847/events) and a Vite React app on [http://localhost:5173](http://localhost:5173). Override the agent port with `PORT`. Do not run the CLI and the demo server against the same reader at the same time.
+It listens on [http://127.0.0.1:3847/events](http://127.0.0.1:3847/events). Override the port with `PORT`.
 
 ### Node library
 
@@ -163,10 +170,13 @@ Main entry: `tessera-sanitaria-reader`.
 | `readCardData(reader)`           | function | Reads a card already present on a PC/SC reader          |
 | `parsePersonalData(buffer)`      | function | Parses EF.Dati_personali without hardware               |
 | `calculateCardId(raw)`           | function | Builds the 20-digit card number from EF.ID_Carta        |
+| `createTesseraSseServer(opts?)`  | function | Creates and starts the loopback SSE server              |
 | `CardData`                       | type     | Sparse anagraphic object after empty fields are dropped |
 | `WatchOptions`                   | type     | Callbacks passed to the watcher                         |
 | `WatchHandle`                    | type     | `{ close(): void }`                                     |
 | `SmartCardReader`                | type     | Duck-typed PC/SC reader used by `readCardData`          |
+| `AgentOptions`                   | type     | `{ host?, port?, corsOrigin? }`                         |
+| `AgentHandle`                    | type     | `{ close(): void }`                                     |
 
 ### `WatchOptions`
 
@@ -233,7 +243,7 @@ The last digit of `cardId` is a Luhn check digit. The sample value above is illu
 
 ## Browser and React
 
-Do **not** import the main package entry in Vite: it pulls `pcsclite`. Import only the client subpath. A Node agent that calls `watchTesseraSanitaria` must run on the same machine as the reader (`pnpm demo:server` in this repo, or your own process).
+Do **not** import the main package entry in Vite: it pulls `pcsclite`. Import only the client subpath. A Node agent that calls `watchTesseraSanitaria` must run on the same machine as the reader (`npx tessera-sanitaria-agent`, or your own process).
 
 ```ts
 import {
@@ -244,7 +254,7 @@ import {
 } from 'tessera-sanitaria-reader/client';
 ```
 
-`subscribeTesseraSanitaria(onEvent, url?)` opens `EventSource` against `url` (default `DEFAULT_TESSERA_EVENTS_URL`, `http://127.0.0.1:3847/events`) and returns `{ close() }`. The demo Vite proxy forwards `/events` to that agent.
+`subscribeTesseraSanitaria(onEvent, url?)` opens `EventSource` against `url` (default `DEFAULT_TESSERA_EVENTS_URL`, `http://127.0.0.1:3847/events`) and returns `{ close() }`.
 
 This is not a public website integration. The visitor’s browser can only see a reader attached to **the PC that runs the agent**.
 
@@ -286,7 +296,74 @@ export function useTesseraSanitaria() {
 
 ### Electron
 
-In the **main** process, import `tessera-sanitaria-reader` and call `watchTesseraSanitaria`. Do not load `pcsclite` in the renderer.
+In the **main** process, import `tessera-sanitaria-reader` and call `watchTesseraSanitaria`. Send events to the renderer with `webContents.send`. Expose them in `preload.ts` via `contextBridge`. Do not load `pcsclite` in the renderer.
+
+A working app is in [`reader/`](reader/). See its README for setup instructions.
+
+## Integration recipes
+
+The browser cannot talk to the reader alone. A Node process on the **same machine** as the reader must perform the APDU exchange. Two integration paths are provided.
+
+| Scenario                                   | What to install                         | How to integrate                                  |
+| ------------------------------------------ | --------------------------------------- | ------------------------------------------------- |
+| Web app or local site on the operator's PC | Node 18+, `npx tessera-sanitaria-agent` | `tessera-sanitaria-reader/client` in the frontend |
+| Standalone desktop app                     | Node 18+, Electron skeleton             | `watchTesseraSanitaria` in the **main** process   |
+
+### Recipe A — local SSE bridge for a web app
+
+Run the agent on the machine that has the reader:
+
+```bash
+npx tessera-sanitaria-agent
+# Listens on http://127.0.0.1:3847/events
+```
+
+Override defaults with environment variables:
+
+| Variable              | Default          | Description                                 |
+| --------------------- | ---------------- | ------------------------------------------- |
+| `PORT`                | `3847`           | TCP port                                    |
+| `TESSERA_CORS_ORIGIN` | reflect `Origin` | Lock to a specific web origin in production |
+
+The agent also exposes `GET /health` → `{ "ok": true }` for liveness checks.
+
+In the frontend (React, Vue, plain JS — any framework):
+
+```ts
+import { subscribeTesseraSanitaria } from 'tessera-sanitaria-reader/client';
+
+const { close } = subscribeTesseraSanitaria((event) => {
+  if (event.type === 'card') console.log(event.data);
+  if (event.type === 'remove') console.log('card removed');
+  if (event.type === 'error') console.error(event.message);
+});
+```
+
+**Important limitations:**
+
+- A public HTTPS page connecting to `http://127.0.0.1` may be blocked by the browser (mixed content / Private Network Access). Supported setups: site on `localhost`, Electron renderer, or a site served over HTTP on the local machine.
+- The agent reads **the reader attached to the machine that runs the agent** — not the visitor's reader. This is a local-operator tool, not a SaaS integration.
+
+To keep the agent running automatically on startup, add it to the system login items (macOS: System Settings → General → Login Items; Windows: Task Scheduler) pointing to `npx tessera-sanitaria-agent`. Alternatively, use a systemd user unit on Linux.
+
+### Recipe B — Electron app (no open port)
+
+See [`reader/`](reader/) for the self-contained desktop app.
+
+The main process calls `watchTesseraSanitaria` and pushes events to the renderer via IPC. No HTTP server or SSE stream is involved.
+
+```
+watchTesseraSanitaria → ipcMain → contextBridge → React UI
+```
+
+To embed `createTesseraSseServer` in your own Node process instead of using the CLI:
+
+```ts
+import { createTesseraSseServer } from 'tessera-sanitaria-reader';
+
+const agent = createTesseraSseServer({ port: 3847, corsOrigin: 'http://localhost:3000' });
+// agent.close() when done
+```
 
 ## Card protocol
 
@@ -326,6 +403,8 @@ src/
   index.ts                 public Node API
   client.ts                browser EventSource client (no pcsclite)
   cli.ts                   CLI entry
+  agent.ts                 createTesseraSseServer (loopback SSE bridge)
+  agent-cli.ts             tessera-sanitaria-agent bin entry
   types.ts                 CardData and watcher types
   constants.ts             APDU paths, TLV field list, region map
   apdu.ts                  promisified connect / transmit / select / read
@@ -334,13 +413,15 @@ src/
   session.ts               readCardData
   watch.ts                 reader lifecycle
   data/comuniCatastali.json
-demo/                      Vite + React UI and SSE agent (not published)
+reader/                    Electron desktop app with packaging (not in npm tarball)
 test/                      Vitest, synthetic buffers only
 scripts/build-comuni.mjs   regenerate the comuni map
 dist/                      tsup output (the npm artifact)
+  cli.js                   tessera-sanitaria-reader bin
+  agent.js                 tessera-sanitaria-agent bin
 ```
 
-The npm tarball contains `dist/`, `README.md`, and `LICENSE`. JavaScript stays small; cadastral names are one file at `dist/data/comuniCatastali.json`. The React demo is excluded.
+The npm tarball contains `dist/`, `README.md`, and `LICENSE`. JavaScript stays small; cadastral names are one file at `dist/data/comuniCatastali.json`. The React demo and examples are excluded.
 
 ## Development
 
@@ -355,14 +436,11 @@ pnpm build
 | Script              | Role                                                 |
 | ------------------- | ---------------------------------------------------- |
 | `pnpm dev`          | CLI via `tsx src/cli.ts` (needs a reader)            |
-| `pnpm demo`         | React demo (SSE agent + Vite)                        |
-| `pnpm demo:server`  | Loopback SSE agent only                              |
-| `pnpm demo:ui`      | Vite React UI only                                   |
 | `pnpm build`        | tsup → `dist/` (no sourcemaps, JSON copied as asset) |
 | `pnpm start`        | `node dist/cli.js`                                   |
 | `pnpm test`         | Vitest, no hardware                                  |
 | `pnpm test:watch`   | Vitest watch                                         |
-| `pnpm typecheck`    | `tsc --noEmit` (library + demo)                      |
+| `pnpm typecheck`    | `tsc --noEmit`                                       |
 | `pnpm lint`         | ESLint + Prettier check                              |
 | `pnpm lint:fix`     | ESLint `--fix` and Prettier `--write`                |
 | `pnpm format`       | Prettier `--write`                                   |
@@ -399,7 +477,7 @@ The library layer does not print `CardData`. The CLI and demo agent log reader n
 
 - Fields the chip leaves empty (`street`, `height`, `citizenship`, notes) are omitted. That is not a parse failure.
 - MUTE inserts and missing ATR are ignored until the card is readable.
-- There is no PC/SC test suite in CI; live reads require hardware (`pnpm dev` or `pnpm demo`).
+- There is no PC/SC test suite in CI; live reads require hardware (`pnpm dev`).
 - Luhn generation matches the TS-CNS algorithm used on the card (walk the payload from the right without doubling the last payload digit before appending the check digit).
 
 ## Contributing

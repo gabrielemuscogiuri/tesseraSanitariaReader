@@ -19,19 +19,17 @@ export default defineConfig({
   async onSuccess() {
     await mkdir('dist/data', { recursive: true });
     await copyFile('src/data/comuniCatastali.json', 'dist/data/comuniCatastali.json');
-    await esbuild({
-      entryPoints: ['src/cli.ts'],
-      outfile: 'dist/cli.js',
+    const sharedBinConfig = {
       bundle: true,
-      format: 'esm',
-      platform: 'node',
+      format: 'esm' as const,
+      platform: 'node' as const,
       target: 'node18',
       minify: true,
       banner: { js: '#!/usr/bin/env node' },
       plugins: [
         {
           name: 'external-index',
-          setup(build) {
+          setup(build: import('esbuild').PluginBuild) {
             build.onResolve({ filter: /^\.\/index\.js$/ }, () => ({
               path: './index.js',
               external: true,
@@ -40,6 +38,13 @@ export default defineConfig({
         },
       ],
       external: ['pcsclite'],
+    };
+
+    await esbuild({ entryPoints: ['src/cli.ts'], outfile: 'dist/cli.js', ...sharedBinConfig });
+    await esbuild({
+      entryPoints: ['src/agent-cli.ts'],
+      outfile: 'dist/agent.js',
+      ...sharedBinConfig,
     });
   },
 });
