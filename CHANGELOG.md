@@ -21,6 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `demo/server.ts` refactored as a thin wrapper around `createTesseraSseServer`
 - Error message in `tessera-sanitaria-reader/client` updated to reference the agent binary
 
+## [1.1.2] - 2026-08-19
+
+### Added
+
+- README: download link for the macOS desktop app (DMG) and recommended reader model (BIT4ID miniLector EVO v3)
+- Git hook (`prepare-commit-msg`) to strip Cursor co-author trailers from commit messages
+
 ## [1.1.1] - 2026-08-19
 
 ### Added
@@ -54,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Legacy `index.js` copies and in-bundle HTML UI
 
-[1.1.0]: https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases/tag/v1.1.0
+[1.1.2]: https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases/tag/v1.1.2
 [1.1.1]: https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases/tag/v1.1.1
+[1.1.0]: https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases/tag/v1.1.0
 [1.0.0]: https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases/tag/v1.0.0

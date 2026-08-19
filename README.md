@@ -15,24 +15,24 @@ Dual package (ESM + CommonJS), CLI, and a browser client subpath. Municipality n
 
 Node.js **18+** and a PC/SC smart-card reader. The package is published as a **GitHub Release** (npm registry requires 2FA on the publisher account).
 
-From the v1.1.0 tarball:
+From the v1.1.1 tarball:
 
 ```bash
-npm install https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases/download/v1.1.0/tessera-sanitaria-reader-1.1.0.tgz
+npm install https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases/download/v1.1.1/tessera-sanitaria-reader-1.1.1.tgz
 ```
 
 ```bash
-pnpm add https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases/download/v1.1.0/tessera-sanitaria-reader-1.1.0.tgz
+pnpm add https://github.com/gabrielemuscogiuri/tesseraSanitariaReader/releases/download/v1.1.1/tessera-sanitaria-reader-1.1.1.tgz
 ```
 
 From git (builds `dist/` on install):
 
 ```bash
-npm install github:gabrielemuscogiuri/tesseraSanitariaReader#v1.1.0
+npm install github:gabrielemuscogiuri/tesseraSanitariaReader#v1.1.1
 ```
 
 ```bash
-pnpm add github:gabrielemuscogiuri/tesseraSanitariaReader#v1.1.0
+pnpm add github:gabrielemuscogiuri/tesseraSanitariaReader#v1.1.1
 ```
 
 CLI, after a local install:
@@ -100,6 +100,14 @@ Do not import the main entry in a browser bundle. It will fail to resolve the na
   - **Windows:** WinSCard (built in)
 
 Verified with **BIT4ID miniLector EVO**, protocol T=1. Other CCID readers that expose the same CNS filesystem should work.
+
+## Desktop reader (macOS)
+
+If you want the “double click, runs in background, lives in tray” desktop app on macOS (no Node/terminal on the user machine):
+
+- Download DMG (arm64): https://drive.google.com/file/d/1NlQWFSUuNXAzLojcHnLVkArBUSe2Abw1/view?usp=sharing
+
+Recommended reader model: **BIT4ID miniLector EVO v3** (PC/SC).
 
 ## Repository setup
 
